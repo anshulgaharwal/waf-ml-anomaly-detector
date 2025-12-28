@@ -1,15 +1,34 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import joblib
+import os
 from sklearn.ensemble import IsolationForest
 
 def load_data():
     df = pd.read_csv("./data/traffic_data.csv")
     return df
 
+import os
+
 def train_model(df):
+    model_path = "models/isolation_forest.pkl"
+
+    # If model already exists → load
+    if os.path.exists(model_path):
+        print("📌 Loaded existing trained model")
+        model = joblib.load(model_path)
+        return model
+
+    # Else train new model
+    print("⚙️ Training new model...")
     model = IsolationForest(contamination=0.15, random_state=42)
     model.fit(df)
+
+    joblib.dump(model, model_path)
+    print("💾 Model saved successfully")
+
     return model
+
 
 def detect_anomalies(model, df):
     predictions = model.predict(df)
