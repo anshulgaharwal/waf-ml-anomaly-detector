@@ -120,3 +120,71 @@ Suggested WAF Rules:
  SecRule REQUEST_BODY_LENGTH "@gt 1200" "id:1002,phase:2,deny,status:403,msg:'Suspicious Large Payload'"
  SecRule IP_DIVERSITY "@gt 10" "id:1003,phase:1,deny,status:403,msg:'Possible Botnet Detected'"
  SecRule ENGINE ON 'ActivateEmergencyMode'
+
+========== Anomaly Detected ==========
+Time: 2025-12-28 23:22:32.896625
+Requests Per Min: 150
+Avg Payload: 1800
+Unique IPs: 15
+Severity: CRITICAL
+Reason: Unusual traffic spike, Large payload anomaly, Abnormal IP activity
+Recommended Actions:
+ - Apply rate limiting (e.g., max 50 requests/min per IP)
+ - Enable deep payload inspection / block unusually large requests
+ - Possible botnet / distributed attack → enable IP reputation & bot protection
+Suggested WAF Rules:
+ SecRule REQUESTS_PER_MINUTE "@gt 100" "id:1001,phase:1,deny,status:429,msg:'Rate Limit Exceeded'"
+ SecRule REQUEST_BODY_LENGTH "@gt 1200" "id:1002,phase:2,deny,status:403,msg:'Suspicious Large Payload'"
+ SecRule IP_DIVERSITY "@gt 10" "id:1003,phase:1,deny,status:403,msg:'Possible Botnet Detected'"
+ SecRule ENGINE ON 'ActivateEmergencyMode'
+
+========== Anomaly Detected ==========
+Time: 2025-12-28 23:25:51.216632
+Requests Per Min: 150
+Avg Payload: 1800
+Unique IPs: 15
+Severity: CRITICAL
+Reason: Unusual traffic spike, Large payload anomaly, Abnormal IP activity
+Recommended Actions:
+ - Apply rate limiting (e.g., max 50 requests/min per IP)
+ - Enable deep payload inspection / block unusually large requests
+ - Possible botnet / distributed attack → enable IP reputation & bot protection
+Suggested WAF Rules:
+ SecRule REQUESTS_PER_MINUTE "@gt 100" "id:1001,phase:1,deny,status:429,msg:'Rate Limit Exceeded'"
+ SecRule REQUEST_BODY_LENGTH "@gt 1200" "id:1002,phase:2,deny,status:403,msg:'Suspicious Large Payload'"
+ SecRule IP_DIVERSITY "@gt 10" "id:1003,phase:1,deny,status:403,msg:'Possible Botnet Detected'"
+ SecRule ENGINE ON 'ActivateEmergencyMode'
+
+========== Anomaly Detected ==========
+Time: 2025-12-28 23:25:51.225001
+Requests Per Min: 300
+Avg Payload: 2000
+Unique IPs: 25
+Severity: CRITICAL
+Reason: Unusual traffic spike, Large payload anomaly, Abnormal IP activity
+Recommended Actions:
+ - Apply rate limiting (e.g., max 50 requests/min per IP)
+ - Enable deep payload inspection / block unusually large requests
+ - Possible botnet / distributed attack → enable IP reputation & bot protection
+Suggested WAF Rules:
+ SecRule REQUESTS_PER_MINUTE "@gt 100" "id:1001,phase:1,deny,status:429,msg:'Rate Limit Exceeded'"
+ SecRule REQUEST_BODY_LENGTH "@gt 1200" "id:1002,phase:2,deny,status:403,msg:'Suspicious Large Payload'"
+ SecRule IP_DIVERSITY "@gt 10" "id:1003,phase:1,deny,status:403,msg:'Possible Botnet Detected'"
+ SecRule ENGINE ON 'ActivateEmergencyMode'
+
+========== Anomaly Detected ==========
+Time: 2025-12-28 23:25:51.227610
+Requests Per Min: 180
+Avg Payload: 1500
+Unique IPs: 18
+Severity: CRITICAL
+Reason: Unusual traffic spike, Large payload anomaly, Abnormal IP activity
+Recommended Actions:
+ - Apply rate limiting (e.g., max 50 requests/min per IP)
+ - Enable deep payload inspection / block unusually large requests
+ - Possible botnet / distributed attack → enable IP reputation & bot protection
+Suggested WAF Rules:
+ SecRule REQUESTS_PER_MINUTE "@gt 100" "id:1001,phase:1,deny,status:429,msg:'Rate Limit Exceeded'"
+ SecRule REQUEST_BODY_LENGTH "@gt 1200" "id:1002,phase:2,deny,status:403,msg:'Suspicious Large Payload'"
+ SecRule IP_DIVERSITY "@gt 10" "id:1003,phase:1,deny,status:403,msg:'Possible Botnet Detected'"
+ SecRule ENGINE ON 'ActivateEmergencyMode'

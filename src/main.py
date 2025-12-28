@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import joblib
 from datetime import datetime
 import os
+import json
 from sklearn.ensemble import IsolationForest
 
 def load_data():
@@ -88,6 +89,22 @@ def log_anomaly(row, reasons, severity, recommendations, waf_rules):
         for w in waf_rules:
             file.write(f" {w}\n")
 
+def log_anomaly_json(row, reasons, severity, recommendations, waf_rules):
+    data = {
+        "time": str(datetime.now()),
+        "requests_per_min": int(row["requests_per_min"]),
+        "avg_payload_size": int(row["avg_payload_size"]),
+        "unique_ips": int(row["unique_ips"]),
+        "severity": str(severity),
+        "reasons": [str(r) for r in reasons],
+        "recommendations": [str(r) for r in recommendations],
+        "waf_rules": [str(w) for w in waf_rules]
+    }
+
+    with open("./logs/anomaly_log.json", "a", encoding="utf-8") as file:
+        json.dump(data, file)
+        file.write("\n")
+
 
 def generate_rule_recommendation(row):
     rules = []
@@ -157,6 +174,8 @@ def detect_anomalies(model, df):
             recommendations = generate_rule_recommendation(row)
             waf_rules = generate_waf_rules(row, severity)
             log_anomaly(row, reasons if reasons else ["Statistical anomaly"], severity, recommendations, waf_rules)
+
+            log_anomaly_json(row, reasons if reasons else ["Statistical anomaly"], severity, recommendations, waf_rules)
 
             print("Recommended Security Actions:")
             for r in recommendations:
