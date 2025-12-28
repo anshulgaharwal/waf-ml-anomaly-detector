@@ -42,7 +42,32 @@ def train_model(df):
 
     return model
 
+def calculate_severity(row):
+    score = 0
 
+    # Weight logic
+    if row["requests_per_min"] > 100:
+        score += 3
+    elif row["requests_per_min"] > 50:
+        score += 2
+
+    if row["avg_payload_size"] > 1200:
+        score += 3
+    elif row["avg_payload_size"] > 800:
+        score += 2
+
+    if row["unique_ips"] > 10:
+        score += 3
+    elif row["unique_ips"] > 5:
+        score += 2
+
+    # Convert to label
+    if score >= 7:
+        return "CRITICAL"
+    elif score >= 4:
+        return "MODERATE"
+    else:
+        return "LOW"
 
 def detect_anomalies(model, df):
     predictions = model.predict(df)
@@ -68,6 +93,10 @@ def detect_anomalies(model, df):
                 print("Reason(s):", ", ".join(reasons))
             else:
                 print("Reason: Statistically unusual behavior detected based on learned baseline")
+                
+            severity = calculate_severity(row)
+            print(f"Severity Level: {severity}")
+
 
     
     return df
