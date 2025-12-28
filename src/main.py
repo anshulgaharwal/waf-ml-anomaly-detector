@@ -70,7 +70,7 @@ def calculate_severity(row):
     else:
         return "LOW"
 
-def log_anomaly(row, reasons, severity, recommendations):
+def log_anomaly(row, reasons, severity, recommendations, waf_rules):
     with open("./logs/anomaly_log.txt", "a", encoding="utf-8") as file:
         file.write("\n========== Anomaly Detected ==========\n")
         file.write(f"Time: {datetime.now()}\n")
@@ -79,9 +79,14 @@ def log_anomaly(row, reasons, severity, recommendations):
         file.write(f"Unique IPs: {row['unique_ips']}\n")
         file.write(f"Severity: {severity}\n")
         file.write(f"Reason: {', '.join(reasons)}\n")
+
         file.write("Recommended Actions:\n")
         for r in recommendations:
             file.write(f" - {r}\n")
+
+        file.write("Suggested WAF Rules:\n")
+        for w in waf_rules:
+            file.write(f" {w}\n")
 
 
 def generate_rule_recommendation(row):
@@ -100,6 +105,26 @@ def generate_rule_recommendation(row):
         rules.append("Monitor traffic pattern – potential emerging anomaly")
 
     return rules
+
+def generate_waf_rules(row, severity):
+    waf_rules = []
+
+    if row["requests_per_min"] > 100:
+        waf_rules.append("SecRule REQUESTS_PER_MINUTE \"@gt 100\" \"id:1001,phase:1,deny,status:429,msg:'Rate Limit Exceeded'\"")
+
+    if row["avg_payload_size"] > 1200:
+        waf_rules.append("SecRule REQUEST_BODY_LENGTH \"@gt 1200\" \"id:1002,phase:2,deny,status:403,msg:'Suspicious Large Payload'\"")
+
+    if row["unique_ips"] > 10:
+        waf_rules.append("SecRule IP_DIVERSITY \"@gt 10\" \"id:1003,phase:1,deny,status:403,msg:'Possible Botnet Detected'\"")
+
+    if severity == "CRITICAL":
+        waf_rules.append("SecRule ENGINE ON 'ActivateEmergencyMode'")
+
+    if not waf_rules:
+        waf_rules.append("# No direct blocking rule required — monitor traffic")
+
+    return waf_rules
 
 
 def detect_anomalies(model, df):
@@ -130,11 +155,16 @@ def detect_anomalies(model, df):
             severity = calculate_severity(row)
             print(f"Severity Level: {severity}")
             recommendations = generate_rule_recommendation(row)
-            log_anomaly(row, reasons if reasons else ["Statistical anomaly"], severity, recommendations)
+            waf_rules = generate_waf_rules(row, severity)
+            log_anomaly(row, reasons if reasons else ["Statistical anomaly"], severity, recommendations, waf_rules)
 
             print("Recommended Security Actions:")
             for r in recommendations:
                 print(" -", r)
+
+            print("\nGenerated WAF Rule Suggestions:")
+            for rule in waf_rules:
+                print(" ", rule)
 
     return df
 
