@@ -70,8 +70,8 @@ def calculate_severity(row):
     else:
         return "LOW"
 
-def log_anomaly(row, reasons, severity):
-    with open("./logs/anomaly_log.txt", "a") as file:
+def log_anomaly(row, reasons, severity, recommendations):
+    with open("./logs/anomaly_log.txt", "a", encoding="utf-8") as file:
         file.write("\n========== Anomaly Detected ==========\n")
         file.write(f"Time: {datetime.now()}\n")
         file.write(f"Requests Per Min: {row['requests_per_min']}\n")
@@ -79,6 +79,10 @@ def log_anomaly(row, reasons, severity):
         file.write(f"Unique IPs: {row['unique_ips']}\n")
         file.write(f"Severity: {severity}\n")
         file.write(f"Reason: {', '.join(reasons)}\n")
+        file.write("Recommended Actions:\n")
+        for r in recommendations:
+            file.write(f" - {r}\n")
+
 
 def generate_rule_recommendation(row):
     rules = []
@@ -125,13 +129,13 @@ def detect_anomalies(model, df):
 
             severity = calculate_severity(row)
             print(f"Severity Level: {severity}")
-            log_anomaly(row, reasons if reasons else ["Statistical anomaly"], severity)
-
             recommendations = generate_rule_recommendation(row)
+            log_anomaly(row, reasons if reasons else ["Statistical anomaly"], severity, recommendations)
+
             print("Recommended Security Actions:")
             for r in recommendations:
                 print(" -", r)
-                
+
     return df
 
 def visualize_results(df):
