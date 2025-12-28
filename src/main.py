@@ -8,26 +8,40 @@ def load_data():
     df = pd.read_csv("./data/traffic_data.csv")
     return df
 
-import os
+def analyze_statistics(df):
+    print("\n📊 TRAFFIC BASELINE STATISTICS")
+    print(df.describe())
 
 def train_model(df):
     model_path = "models/isolation_forest.pkl"
 
-    # If model already exists → load
+    mean_requests = df["requests_per_min"].mean()
+    std_requests = df["requests_per_min"].std()
+
+    # Adaptive contamination
+    if std_requests < 20:
+        contamination = 0.05   # stable network → strict
+    elif std_requests < 60:
+        contamination = 0.10   # moderately variable
+    else:
+        contamination = 0.15   # very dynamic traffic
+
+    print(f"\n🧠 Adaptive Contamination Selected: {contamination}")
+
     if os.path.exists(model_path):
         print("📌 Loaded existing trained model")
         model = joblib.load(model_path)
         return model
 
-    # Else train new model
-    print("⚙️ Training new model...")
-    model = IsolationForest(contamination=0.15, random_state=42)
+    print("⚙️ Training new adaptive model...")
+    model = IsolationForest(contamination=contamination, random_state=42)
     model.fit(df)
 
     joblib.dump(model, model_path)
     print("💾 Model saved successfully")
 
     return model
+
 
 
 def detect_anomalies(model, df):
@@ -53,7 +67,8 @@ def detect_anomalies(model, df):
             if reasons:
                 print("Reason(s):", ", ".join(reasons))
             else:
-                print("Reason: Unusual behavioral deviation")
+                print("Reason: Statistically unusual behavior detected based on learned baseline")
+
     
     return df
 
@@ -77,6 +92,7 @@ def visualize_results(df):
 
 if __name__ == "__main__":
     df = load_data()
+    analyze_statistics(df)
     model = train_model(df)
     result = detect_anomalies(model, df)
     print(result)
