@@ -2,13 +2,7 @@ import pandas as pd
 from sklearn.ensemble import IsolationForest
 
 def load_data():
-    data = {
-        "requests_per_min": [10, 12, 11, 9, 8, 300, 10, 11, 12],
-        "avg_payload_size": [400, 420, 430, 410, 415, 2000, 405, 410, 420],
-        "unique_ips": [2, 2, 3, 2, 2, 20, 2, 2, 3]
-    }
-
-    df = pd.DataFrame(data)
+    df = pd.read_csv("./data/traffic_data.csv")
     return df
 
 def train_model(df):
