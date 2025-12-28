@@ -1,0 +1,24 @@
+
+========== Anomaly Detected ==========
+Time: 2025-12-28 21:08:53.501868
+Requests Per Min: 150
+Avg Payload: 1800
+Unique IPs: 15
+Severity: CRITICAL
+Reason: Unusual traffic spike, Large payload anomaly, Abnormal IP activity
+
+========== Anomaly Detected ==========
+Time: 2025-12-28 21:08:53.503870
+Requests Per Min: 300
+Avg Payload: 2000
+Unique IPs: 25
+Severity: CRITICAL
+Reason: Unusual traffic spike, Large payload anomaly, Abnormal IP activity
+
+========== Anomaly Detected ==========
+Time: 2025-12-28 21:08:53.503870
+Requests Per Min: 180
+Avg Payload: 1500
+Unique IPs: 18
+Severity: CRITICAL
+Reason: Unusual traffic spike, Large payload anomaly, Abnormal IP activity

@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import joblib
+from datetime import datetime
 import os
 from sklearn.ensemble import IsolationForest
 
@@ -69,6 +70,16 @@ def calculate_severity(row):
     else:
         return "LOW"
 
+def log_anomaly(row, reasons, severity):
+    with open("./logs/anomaly_log.txt", "a") as file:
+        file.write("\n========== Anomaly Detected ==========\n")
+        file.write(f"Time: {datetime.now()}\n")
+        file.write(f"Requests Per Min: {row['requests_per_min']}\n")
+        file.write(f"Avg Payload: {row['avg_payload_size']}\n")
+        file.write(f"Unique IPs: {row['unique_ips']}\n")
+        file.write(f"Severity: {severity}\n")
+        file.write(f"Reason: {', '.join(reasons)}\n")
+
 def detect_anomalies(model, df):
     predictions = model.predict(df)
     df["anomaly"] = predictions
@@ -93,12 +104,11 @@ def detect_anomalies(model, df):
                 print("Reason(s):", ", ".join(reasons))
             else:
                 print("Reason: Statistically unusual behavior detected based on learned baseline")
-                
+
             severity = calculate_severity(row)
             print(f"Severity Level: {severity}")
-
-
-    
+            log_anomaly(row, reasons if reasons else ["Statistical anomaly"], severity)
+ 
     return df
 
 def visualize_results(df):
