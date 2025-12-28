@@ -80,6 +80,24 @@ def log_anomaly(row, reasons, severity):
         file.write(f"Severity: {severity}\n")
         file.write(f"Reason: {', '.join(reasons)}\n")
 
+def generate_rule_recommendation(row):
+    rules = []
+
+    if row["requests_per_min"] > 100:
+        rules.append("Apply rate limiting (e.g., max 50 requests/min per IP)")
+
+    if row["avg_payload_size"] > 1200:
+        rules.append("Enable deep payload inspection / block unusually large requests")
+
+    if row["unique_ips"] > 10:
+        rules.append("Possible botnet / distributed attack → enable IP reputation & bot protection")
+
+    if not rules:
+        rules.append("Monitor traffic pattern – potential emerging anomaly")
+
+    return rules
+
+
 def detect_anomalies(model, df):
     predictions = model.predict(df)
     df["anomaly"] = predictions
@@ -108,7 +126,12 @@ def detect_anomalies(model, df):
             severity = calculate_severity(row)
             print(f"Severity Level: {severity}")
             log_anomaly(row, reasons if reasons else ["Statistical anomaly"], severity)
- 
+
+            recommendations = generate_rule_recommendation(row)
+            print("Recommended Security Actions:")
+            for r in recommendations:
+                print(" -", r)
+                
     return df
 
 def visualize_results(df):
