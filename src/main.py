@@ -1,4 +1,5 @@
 import pandas as pd
+import matplotlib.pyplot as plt
 from sklearn.ensemble import IsolationForest
 
 def load_data():
@@ -37,9 +38,27 @@ def detect_anomalies(model, df):
     
     return df
 
+def visualize_results(df):
+    plt.figure(figsize=(10,5))
+
+    normal = df[df["anomaly"] == 1]
+    anomaly = df[df["anomaly"] == -1]
+
+    plt.plot(normal["requests_per_min"], label="Normal Traffic", marker='o')
+
+    plt.plot(anomaly["requests_per_min"], 'ro', label="Anomaly")
+
+    plt.title("Network Traffic Anomaly Detection")
+    plt.xlabel("Time / Request Index")
+    plt.ylabel("Requests Per Minute")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
 
 if __name__ == "__main__":
     df = load_data()
     model = train_model(df)
     result = detect_anomalies(model, df)
     print(result)
+    visualize_results(result)
