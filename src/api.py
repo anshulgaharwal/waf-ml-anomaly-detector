@@ -1,7 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import Body
+import joblib
 from .adaptive_learning import decide_new_policy
+import pandas as pd
+import os
 import json
 
 app = FastAPI()
@@ -104,3 +107,53 @@ def get_model_metrics():
 def adaptive_policy():
     policy = decide_new_policy()
     return policy
+
+@app.post("/apply-policy")
+def apply_policy():
+    policy = decide_new_policy()
+
+    # load policy state
+    try:
+        with open("./policy_state.json", "r") as f:
+            state = json.load(f)
+    except:
+        state = {
+            "current_contamination": 0.10,
+            "last_update": None,
+            "status": "unknown"
+        }
+
+    # If no meaningful policy yet
+    if policy["status"] == "insufficient_feedback":
+        return {
+            "updated": False,
+            "message": "Not enough feedback to adapt",
+            "policy": policy
+        }
+
+    # Load training data
+    df = pd.read_csv("./data/traffic_data.csv")
+
+    contamination = policy["recommended_contamination"]
+
+    # retrain model
+    from sklearn.ensemble import IsolationForest
+    model = IsolationForest(contamination=contamination, random_state=42)
+    model.fit(df)
+
+    # save new model
+    joblib.dump(model, "./models/isolation_forest.pkl")
+
+    # update policy state
+    state["current_contamination"] = contamination
+    state["last_update"] = str(datetime.now())
+    state["status"] = policy["status"]
+
+    with open("./policy_state.json", "w") as f:
+        json.dump(state, f, indent=4)
+
+    return {
+        "updated": True,
+        "message": "Model retrained & policy applied successfully",
+        "new_policy": state
+    }
